@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<style>
+	#game {
+		width: 800px;
+		height: 600px;
+		background-color: black;
+		position: relative;
+	}
+
+	#left_paddle, #right_paddle {
+		width: 20px;
+		height: 100px;
+		background-color: white;
+		position: absolute;
+	}
+
+	#ball {
+		width: 20px;
+		height: 20px;
+		background-color: red;
+		position: absolute;
+
+	}
+
+</style>
+<body>
+	<div id="game"></div>
+		<div id="left_paddle"></div>
+		<div id="right_paddle"></div>
+		<div id="ball"></div>
+
+
+	<script>
+		var left_paddle = document.getElementById("left_paddle");
+		var right_paddle = document.getElementById("right_paddle");
+		var ball = document.getElementById("ball");
+
+		var left_paddle_x = 20;
+		var left_paddle_y = 100;
+		
+		var right_paddle_x = 760;
+		var right_paddle_y = 100;
+
+		var ball_x = 400;
+		var ball_y = 300;
+
+		var ball_vx = 2;
+		var ball_vy = 2;
+
+		function draw() {
+			left_paddle.style.top = left_paddle_y + "px";
+			left_paddle.style.left = left_paddle_x + "px";
+
+			right_paddle.style.top = right_paddle_y + "px";
+			right_paddle.style.left = right_paddle_x + "px";
+
+			ball.style.top = ball_y + "px"
+			ball.style.left = ball_x + "px"
+		}
+
+		function updateBall() {
+			if(ball_y >= (600 - 20) && ball_vy > 0) {
+				ball_vy = ball_vy * -1;
+			}
+
+			if (ball_y <= 0 && ball_vy < 0) {
+				ball_vy = ball_vy * - 1;
+			}
+			
+			
+
+			
+			ball_y += ball_vy;
+			ball_x += ball_vx;
+
+		}
+
+
+
+
+		function update() {
+			updateBall();
+		}
+
+		function loop() {
+			update();
+			draw();
+		}
+
+		function handleMouseMove(event) {
+			left_paddle_y = event.pageY - event.target.offsetTop - 50;
+
+		}
+
+		setInterval(loop, (1000/60));
+
+
+		document.getElementById("game").onmousemove = handleMouseMove;
+
+
+
+	</script>
+
+
+
+
+</body>
+</html>
