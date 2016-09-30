@@ -3,54 +3,84 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Document</title>
+	<style>
+		#game {
+			width: 800px;
+			height: 600px;
+			background-color: black;
+			position: relative;
+		}
+
+		#left_paddle, #right_paddle {
+			width: 20px;
+			height: 100px;
+			background-color: white;
+			position: absolute;
+		}
+
+		#ball {
+			width: 20px;
+			height: 20px;
+			background-color: white;
+			position: absolute;
+		}
+
+		h1 {
+			color: white;
+			text-align: center;
+		}
+
+		#rightpoints {
+			width: 20px;
+			height: 20px;
+			background-color: white;
+			position: absolute;
+			top: 10px;
+			left: 530px;
+			
+		}
+
+		#leftpoints {
+			width: 20px;
+			height: 20px;
+			background-color: white;
+			position: absolute;
+			top: 10px;
+			left: 250px;
+			
+		}
+	</style>
 </head>
-<style>
-	#game {
-		width: 800px;
-		height: 600px;
-		background-color: black;
-		position: relative;
-	}
-
-	#left_paddle, #right_paddle {
-		width: 20px;
-		height: 100px;
-		background-color: white;
-		position: absolute;
-	}
-
-	#ball {
-		width: 20px;
-		height: 20px;
-		background-color: red;
-		position: absolute;
-
-	}
-
-</style>
 <body>
-	<div id="game"></div>
+	<div id="game">
+		<h1>SCORE </h1>
+		<div id="leftpoints"></div>
+		<div id="rightpoints"></div>
 		<div id="left_paddle"></div>
 		<div id="right_paddle"></div>
 		<div id="ball"></div>
-
+	</div>
 
 	<script>
+
 		var left_paddle = document.getElementById("left_paddle");
 		var right_paddle = document.getElementById("right_paddle");
 		var ball = document.getElementById("ball");
 
 		var left_paddle_x = 20;
 		var left_paddle_y = 100;
-		
+
 		var right_paddle_x = 760;
 		var right_paddle_y = 100;
 
 		var ball_x = 400;
 		var ball_y = 300;
 
-		var ball_vx = 2;
+		var ball_vx = -2;
 		var ball_vy = 2;
+
+		var leftScore = 0;
+		var rightScore = 0;
 
 		function draw() {
 			left_paddle.style.top = left_paddle_y + "px";
@@ -59,32 +89,60 @@
 			right_paddle.style.top = right_paddle_y + "px";
 			right_paddle.style.left = right_paddle_x + "px";
 
-			ball.style.top = ball_y + "px"
-			ball.style.left = ball_x + "px"
+			ball.style.top = ball_y + "px";
+			ball.style.left = ball_x + "px";
 		}
 
-		function updateBall() {
-			if(ball_y >= (600 - 20) && ball_vy > 0) {
-				ball_vy = ball_vy * -1;
+		function updateBall(){
+			if(
+				ball_y >= (600 - 20) // the ball is touching the bottom
+				&& ball_vy > 0 // and we are heading downward still
+			) {
+				ball_vy = ball_vy * -1; // bounce in the y direction
 			}
 
 			if (ball_y <= 0 && ball_vy < 0) {
-				ball_vy = ball_vy * - 1;
+				ball_vy = ball_vy * -1; // bounce in the y direction
 			}
-			
-			
 
-			
-			ball_y += ball_vy;
 			ball_x += ball_vx;
+			ball_y += ball_vy;
+
+			right_paddle_y = ball_y - 50;
+			
+			if (ball_x < 0) {
+				score("right")
+			}else if (ball_x > 780) {
+				score("left");
+			}
+
+
 
 		}
 
+		function checkCollision() {
 
-
+			if (ball_x < left_paddle_x + 20
+				&& ball_y < left_paddle_y + 100
+				&& ball_x + 20 > left_paddle_x
+				&& ball_y + 20 > left_paddle_y
+				&& ball_vx < 0) {
+				ball_vx *= -1;
+		
+			}else if (ball_x < right_paddle_x + 20
+				&& ball_y < right_paddle_y + 100
+				&& ball_x + 20 > right_paddle_x
+				&& ball_y + 20 > right_paddle_y
+				&& ball_vx > 0) {
+				ball_vx *= -1;
+			}
+		}
 
 		function update() {
 			updateBall();
+
+			checkCollision();
+
 		}
 
 		function loop() {
@@ -94,20 +152,56 @@
 
 		function handleMouseMove(event) {
 			left_paddle_y = event.pageY - event.target.offsetTop - 50;
-
 		}
+		
+		function score(whoScored) {
+			ball_x = 400;
+		 	ball_y = 300;
 
-		setInterval(loop, (1000/60));
+			if ("right") {
+				rightScore +=1;
+				ball_vx = -2;
+				ball_vy = 2
+				document.getElementById("rightpoints").innerHTML = rightScore;	
+				}else
+				leftScore +=1;
+				ball_vx = 2;
+				ball_vy = 2;
+				document.getElementById("leftpoints").innerHTML = leftScore;	
+	
+			//console.log(rightScore);
+	}
 
+		setInterval(loop, (1000 / 60));
 
 		document.getElementById("game").onmousemove = handleMouseMove;
 
+		/*
+		TODO:
+
+		1. Get the computer player working
+		2. Get the ball to bounce off of the computer player's paddle
+		3. Display the score somehow?
+		4. If the ball goes off the side, increase the score for the other player
+		5. When the ball goes off the side, reset the game so the ball is in the middle
+
+		Optional:
+		Whoever lost the last point serves
+		Have the ball delay start when it is reset
+		Interesting graphics
+		Ball moves faster as the game goes on
+
+		Difficult and optional:
+		Adjust the angle of the ball based on where it hits the paddle
+		(or based on the speed of the paddle)
+		Have the ability to have many balls in play at one time
+		Make the computer not a perfect pong player
+		Max out the speed at which the player can move their paddle
+		Add keyboard controls for player 2 (multiplayer mode!)
+
+		*/
 
 
 	</script>
-
-
-
-
 </body>
 </html>
